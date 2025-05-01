@@ -54,7 +54,7 @@ int main(int argc, char** argv)
         auto u = logic::Unit::getDefaultParams("Swordsman");
         u.id = command.unitId;
         u.hp = command.hp;
-        auto a1 = logic::Attack::getDefaultParams("SwordsmanMelee");
+        auto a1 = logic::Attack::getDefaultParams("Melee");
         a1.strength = command.strength;
         logic::Unit::AttackParamsList attacksParams = {a1};
         map.spawnUnit(u, attacksParams);
@@ -66,10 +66,11 @@ int main(int argc, char** argv)
         logic::Unit::Params u = logic::Unit::getDefaultParams("Hunter");
         u.id = command.unitId;
         u.hp = command.hp;
-        auto a1 = logic::Attack::getDefaultParams("HunterRanged");
+        auto a1 = logic::Attack::getDefaultParams("Ranged");
         a1.strength = command.agility;
-        auto a2 = logic::Attack::getDefaultParams("HunterMelee");
-        a1.strength = command.strength;
+        a1.distance = command.range;
+        auto a2 = logic::Attack::getDefaultParams("Melee");
+        a2.strength = command.strength;
         logic::Unit::AttackParamsList attacksParams = {a1, a2};
         map.spawnUnit(u, attacksParams);
         map.moveUnit(u.id, command.x, command.y);

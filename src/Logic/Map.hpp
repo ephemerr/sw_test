@@ -1,8 +1,11 @@
 #pragma once
 
+#include "Attack.hpp"
 #include "Unit.hpp"
+#include "Coord.hpp"
 
 #include <unordered_map>
+#include <map>
 #include <cstdint>
 
 namespace sw::logic
@@ -19,5 +22,10 @@ namespace sw::logic
         void moveUnit(uint32_t id, uint32_t x, uint32_t y);
         void spawnUnit(const Unit::Params& params, const Unit::AttackParamsList& attacksParams);
         void startTheBattle();
+        void doAttack(const Attack::Params& attack, uint32_t offender, uint32_t target);
+        typedef std::multimap<uint32_t, uint32_t> DistancesList;
+        DistancesList distancesToUnits(const Coord& from) const;
+        DistancesList findOpenTargets(const Coord& from, const Attack::Params& attack) const;
+
 	};
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Attack.hpp"
+#include "Coord.hpp"
 
 #include <cstdint>
 #include <vector>
@@ -26,19 +27,16 @@ namespace sw::logic
 
         typedef std::vector<Attack::Params> AttackParamsList;
         void setAttacks(const AttackParamsList &attacks);
+        const AttackParamsList& getAttacks() const;
+
+        void setCoords(const Coord& coords);
+        const Coord& getCoord() const;
 
         Unit();
         Unit(const Params &params);
 
-        void setCoords(uint32_t x, uint32_t y);
-        const AttackParamsList& getAttacks();
-        uint32_t getX() const;
-        uint32_t getY() const;
-
-
     private:
-        uint32_t _x;
-        uint32_t _y;
+        Coord _coords;
         Params _params;
         std::vector<logic::Attack::Params> _attacksParams;
     };

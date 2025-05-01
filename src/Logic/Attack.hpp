@@ -9,10 +9,16 @@ namespace sw::logic
 	class Attack
     {
     public:
+        enum Type {
+             ATTACK_TYPE_NONE   = 0
+            ,ATTACK_TYPE_MELEE  = 1
+            ,ATTACK_TYPE_RANGED = 2
+            ,ATTACK_TYPE_FIRE   = 4
+        };
 
         struct Params
         {
-            uint32_t id{};
+            uint32_t type{};
             uint32_t distance{};
             uint32_t minDistance{};
             uint32_t radius{};

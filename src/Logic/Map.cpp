@@ -1,6 +1,11 @@
 #include "Map.hpp"
 #include "Attack.hpp"
 #include "Unit.hpp"
+#include "Coord.hpp"
+
+#include <cstdint>
+#include <vector>
+#include <utility>
 
 namespace sw::logic
 {
@@ -22,10 +27,11 @@ namespace sw::logic
         {
             for (const auto &u : _units)
             {
-                if (u.second.getX() == x && u.second.getY() == y)
+                const Coord& c = u.second.getCoord();
+                if (c.x == x && c.y == y)
                     return;
             }
-           _units[id].setCoords(x,y);
+           _units[id].setCoords({x,y});
         }
     }
 
@@ -41,16 +47,51 @@ namespace sw::logic
        {
            for (auto &[id, activeUnit]: _units)
            {
-               const auto& attacksList = activeUnit.getAttacks();
-               for (auto &attack: attacksList)
+               auto distances = distancesToUnits(activeUnit.getCoord());
+               for (const auto& attack: activeUnit.getAttacks())
                {
+
                }
 
-               for (auto &target : _units) {
+               for (auto& target : _units) {
 
                }
            }
        }
+    }
+    //
+    // void Map::doAttack(const Attack::Params& attack, uint32_t targer, uint32_t targer);
+    //
+
+    Map::DistancesList Map::distancesToUnits(const Coord& from) const
+    {
+        DistancesList res;
+        for(const auto& [id,unit] : _units)
+        {
+            const Coord& target = unit.getCoord();
+            auto distance = from.distance(target);
+            res.insert(std::pair{distance,id});
+        }
+        return res;
+    }
+
+    Map::DistancesList Map::findOpenTargets(const Coord& from, const Attack::Params& attack) const
+    {
+        DistancesList res;
+        for(const auto& [id,unit] : _units)
+        {
+            const Coord& target = unit.getCoord();
+            auto distance = from.distance(target);
+            if (attack.type | Attack::ATTACK_TYPE_RANGED && distance == 1)
+            {
+                return {};
+            }
+            if (distance > attack.distance || distance < attack.minDistance)
+            {
+                continue;
+            }
+        }
+        return res;
     }
 }
 
