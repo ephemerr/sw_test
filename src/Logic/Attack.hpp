@@ -1,15 +1,29 @@
 #pragma once
 
 #include <cstdint>
+#include <unordered_map>
+#include <string>
 
 namespace sw::logic
 {
-	struct Attack
-	{
-        uint32_t distance{};
-        uint32_t minDistance{};
-        uint32_t radius{};
-        uint32_t type{};
-        uint32_t strenght{};
-	};
+	class Attack
+    {
+    public:
+
+        struct Params
+        {
+            uint32_t id{};
+            uint32_t distance{};
+            uint32_t minDistance{};
+            uint32_t radius{};
+            uint32_t strenght{};
+        };
+
+        typedef std::unordered_map<std::string,Params> ParamTable;
+
+    private:
+        Params _params;
+
+        static ParamTable _paramTable;
+    };
 }

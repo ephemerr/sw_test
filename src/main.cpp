@@ -22,6 +22,8 @@ int main(int argc, char** argv)
 {
 	using namespace sw;
 
+	EventLog eventLog;
+
 	if (argc != 2)
 	{
 		throw std::runtime_error("Error: No file specified in command line argument");
@@ -35,10 +37,18 @@ int main(int argc, char** argv)
 
 	// Code for example...
 
+    logic::Map map;
+
 	std::cout << "Commands:\n";
 	io::CommandParser parser;
-	parser.add<io::CreateMap>([](auto command) { printDebug(std::cout, command); })
-		.add<io::SpawnSwordsman>([](auto command) { printDebug(std::cout, command); })
+	parser.add<io::CreateMap>([](auto command)
+    {
+        // map.setCoords(command.width,command.height);
+    })
+    .add<io::SpawnSwordsman>([](auto command)
+            {
+                printDebug(std::cout, command);
+            })
 		.add<io::SpawnHunter>([](auto command) { printDebug(std::cout, command); })
 		.add<io::March>([](auto command) { printDebug(std::cout, command); });
 
@@ -46,7 +56,6 @@ int main(int argc, char** argv)
 
 	// std::cout << "\n\nEvents:\n";
 
-	// EventLog eventLog;
 
 	// eventLog.log(1, io::MapCreated{10, 10});
 	// eventLog.log(1, io::UnitSpawned{1, "Swordsman", 0, 0});
