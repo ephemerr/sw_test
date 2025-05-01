@@ -51,29 +51,27 @@ int main(int argc, char** argv)
     .add<io::SpawnSwordsman>([&map](auto command)
     {
         printDebug(std::cout, command);
-        auto u = logic::Unit::getDefaultParams("Swordsman"); // TODO DRY
+        auto u = logic::Unit::getDefaultParams("Swordsman");
         u.id = command.unitId;
         u.hp = command.hp;
         auto a1 = logic::Attack::getDefaultParams("SwordsmanMelee");
         a1.strength = command.strength;
-        std::vector<logic::Attack::Params> attacksParams = {a1};
-        auto &unit = map.spawnUnit(u);
-        unit.setAttacks(attacksParams);
+        logic::Unit::AttackParamsList attacksParams = {a1};
+        map.spawnUnit(u, attacksParams);
         map.moveUnit(u.id, command.x, command.y);
     })
     .add<io::SpawnHunter>([&map](auto command)
     {
         printDebug(std::cout, command);
-        logic::Unit::Params u = logic::Unit::getDefaultParams("Hunter"); // TODO: DRY
+        logic::Unit::Params u = logic::Unit::getDefaultParams("Hunter");
         u.id = command.unitId;
         u.hp = command.hp;
         auto a1 = logic::Attack::getDefaultParams("HunterRanged");
         a1.strength = command.agility;
         auto a2 = logic::Attack::getDefaultParams("HunterMelee");
         a1.strength = command.strength;
-        std::vector<logic::Attack::Params> attacksParams = {a1, a2};
-        auto &unit = map.spawnUnit(u);
-        unit.setAttacks(attacksParams);
+        logic::Unit::AttackParamsList attacksParams = {a1, a2};
+        map.spawnUnit(u, attacksParams);
         map.moveUnit(u.id, command.x, command.y);
     })
 	.add<io::March>([&map](auto command)

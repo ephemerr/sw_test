@@ -20,7 +20,7 @@ namespace sw::logic {
     {
     }
 
-    Unit::Unit(Params &params): _params(params)
+    Unit::Unit(const Params &params): _params(params)
     {
         for (const auto &attackName : _params.attacks)
         {
@@ -34,9 +34,15 @@ namespace sw::logic {
         _x = x;
         _y = y;
     }
-    void Unit::setAttacks(std::vector<Attack::Params> &attacks)
+
+    void Unit::setAttacks(const AttackParamsList &attacks)
     {
         _attacksParams = attacks;
+    }
+
+    const Unit::AttackParamsList& Unit::getAttacks()
+    {
+        return _attacksParams;
     }
 
     uint32_t Unit::getX() const

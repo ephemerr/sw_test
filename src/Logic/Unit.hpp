@@ -24,10 +24,14 @@ namespace sw::logic
         typedef std::unordered_map<std::string,Params> ParamTable;
         static const Params& getDefaultParams(const std::string &str);
 
+        typedef std::vector<Attack::Params> AttackParamsList;
+        void setAttacks(const AttackParamsList &attacks);
+
         Unit();
-        Unit(Params &params);
+        Unit(const Params &params);
+
         void setCoords(uint32_t x, uint32_t y);
-        void setAttacks(std::vector<Attack::Params> &attacks);
+        const AttackParamsList& getAttacks();
         uint32_t getX() const;
         uint32_t getY() const;
 

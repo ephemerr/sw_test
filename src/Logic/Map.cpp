@@ -1,16 +1,17 @@
 #include "Map.hpp"
+#include "Attack.hpp"
 #include "Unit.hpp"
 
 namespace sw::logic
 {
+    Map::Map()
+    {
+    }
+
     void Map::setCoords(uint32_t w, uint32_t h)
     {
         _width = w;
         _height = h;
-    }
-
-    Map::Map()
-    {
     }
 
     void Map::moveUnit(uint32_t id, uint32_t x, uint32_t y)
@@ -28,10 +29,28 @@ namespace sw::logic
         }
     }
 
-    Unit& Map::spawnUnit(Unit::Params params)
+    void Map::spawnUnit(const Unit::Params& params, const Unit::AttackParamsList& attacksParams = {})
     {
        _units[params.id] = Unit(params);
-       return  _units[params.id];
+       _units[params.id].setAttacks(attacksParams);
+    }
+
+    void Map::startTheBattle()
+    {
+       while(_units.size() > 1)
+       {
+           for (auto &[id, activeUnit]: _units)
+           {
+               const auto& attacksList = activeUnit.getAttacks();
+               for (auto &attack: attacksList)
+               {
+               }
+
+               for (auto &target : _units) {
+
+               }
+           }
+       }
     }
 }
 
