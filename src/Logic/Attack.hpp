@@ -16,14 +16,13 @@ namespace sw::logic
             uint32_t distance{};
             uint32_t minDistance{};
             uint32_t radius{};
-            uint32_t strenght{};
+            uint32_t strength{};
         };
 
         typedef std::unordered_map<std::string,Params> ParamTable;
+        static const Params& getDefaultParams(const std::string &str);
 
     private:
         Params _params;
-
-        static ParamTable _paramTable;
     };
 }

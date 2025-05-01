@@ -3,10 +3,14 @@
 
 namespace sw::logic
 {
-    Attack::ParamTable Attack::_paramTable =
+    const Attack::Params& Attack::getDefaultParams(const std::string &str)
     {
-        {"SwordsmanMele",{1,1,1,0,50}},
-        {"HunterRanged",{1,0,2,0,75}},
-        {"HunterMele",{1,1,1,0,25}}
-    };
+        static Attack::ParamTable _paramTable =
+        {
+            {"SwordsmanMelee",{1,1,1,0,50}},
+            {"HunterRanged",{2,0,2,0,75}},
+            {"HunterMelee",{3,1,1,0,25}}
+        };
+        return _paramTable[str];
+    }
 }

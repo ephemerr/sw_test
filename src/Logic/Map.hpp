@@ -17,6 +17,6 @@ namespace sw::logic
         Map();
         void setCoords(uint32_t w, uint32_t h);
         void moveUnit(uint32_t id, uint32_t x, uint32_t y);
-        void spawnUnit(Unit::Params params);
+        Unit& spawnUnit(Unit::Params params);
 	};
 }

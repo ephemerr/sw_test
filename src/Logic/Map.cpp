@@ -28,9 +28,10 @@ namespace sw::logic
         }
     }
 
-    void Map::spawnUnit(Unit::Params params)
+    Unit& Map::spawnUnit(Unit::Params params)
     {
-       // _units[params.id] = Unit(params);
+       _units[params.id] = Unit(params);
+       return  _units[params.id];
     }
 }
 

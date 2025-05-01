@@ -13,7 +13,9 @@
 #include <IO/System/EventLog.hpp>
 #include <IO/System/PrintDebug.hpp>
 
+#include "Logic/Attack.hpp"
 #include "Logic/Map.hpp"
+#include "Logic/Unit.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -41,54 +43,46 @@ int main(int argc, char** argv)
 
 	std::cout << "Commands:\n";
 	io::CommandParser parser;
-	parser.add<io::CreateMap>([](auto command)
+	parser.add<io::CreateMap>([&map](auto command)
     {
-        // map.setCoords(command.width,command.height);
+        printDebug(std::cout, command);
+        map.setCoords(command.width,command.height);
     })
-    .add<io::SpawnSwordsman>([](auto command)
-            {
-                printDebug(std::cout, command);
-            })
-		.add<io::SpawnHunter>([](auto command) { printDebug(std::cout, command); })
-		.add<io::March>([](auto command) { printDebug(std::cout, command); });
+    .add<io::SpawnSwordsman>([&map](auto command)
+    {
+        printDebug(std::cout, command);
+        auto u = logic::Unit::getDefaultParams("Swordsman"); // TODO DRY
+        u.id = command.unitId;
+        u.hp = command.hp;
+        auto a1 = logic::Attack::getDefaultParams("SwordsmanMelee");
+        a1.strength = command.strength;
+        std::vector<logic::Attack::Params> attacksParams = {a1};
+        auto &unit = map.spawnUnit(u);
+        unit.setAttacks(attacksParams);
+        map.moveUnit(u.id, command.x, command.y);
+    })
+    .add<io::SpawnHunter>([&map](auto command)
+    {
+        printDebug(std::cout, command);
+        logic::Unit::Params u = logic::Unit::getDefaultParams("Hunter"); // TODO: DRY
+        u.id = command.unitId;
+        u.hp = command.hp;
+        auto a1 = logic::Attack::getDefaultParams("HunterRanged");
+        a1.strength = command.agility;
+        auto a2 = logic::Attack::getDefaultParams("HunterMelee");
+        a1.strength = command.strength;
+        std::vector<logic::Attack::Params> attacksParams = {a1, a2};
+        auto &unit = map.spawnUnit(u);
+        unit.setAttacks(attacksParams);
+        map.moveUnit(u.id, command.x, command.y);
+    })
+	.add<io::March>([&map](auto command)
+    {
+        printDebug(std::cout, command);
+        map.moveUnit(command.unitId, command.targetX, command.targetY);
+    });
 
 	parser.parse(file);
-
-	// std::cout << "\n\nEvents:\n";
-
-
-	// eventLog.log(1, io::MapCreated{10, 10});
-	// eventLog.log(1, io::UnitSpawned{1, "Swordsman", 0, 0});
-	// eventLog.log(1, io::UnitSpawned{2, "Hunter", 9, 0});
-	// eventLog.log(1, io::MarchStarted{1, 0, 0, 9, 0});
-	// eventLog.log(1, io::MarchStarted{2, 9, 0, 0, 0});
-	// eventLog.log(1, io::UnitSpawned{3, "Swordsman", 0, 9});
-	// eventLog.log(1, io::MarchStarted{3, 0, 9, 0, 0});
-    //
-	// eventLog.log(2, io::UnitMoved{1, 1, 0});
-	// eventLog.log(2, io::UnitMoved{2, 8, 0});
-	// eventLog.log(2, io::UnitMoved{3, 0, 8});
-    //
-	// eventLog.log(3, io::UnitMoved{1, 2, 0});
-	// eventLog.log(3, io::UnitMoved{2, 7, 0});
-	// eventLog.log(3, io::UnitMoved{3, 0, 7});
-    //
-	// eventLog.log(4, io::UnitMoved{1, 3, 0});
-	// eventLog.log(4, io::UnitAttacked{2, 1, 5, 0});
-	// eventLog.log(4, io::UnitDied{1});
-	// eventLog.log(4, io::UnitMoved{3, 0, 6});
-    //
-	// eventLog.log(5, io::UnitMoved{2, 6, 0});
-	// eventLog.log(5, io::UnitMoved{3, 0, 5});
-    //
-	// eventLog.log(6, io::UnitMoved{2, 5, 0});
-	// eventLog.log(6, io::UnitMoved{3, 0, 4});
-    //
-	// eventLog.log(7, io::UnitAttacked{2, 3, 5, 5});
-	// eventLog.log(7, io::UnitMoved{3, 0, 3});
-    //
-	// eventLog.log(8, io::UnitAttacked{2, 3, 5, 0});
-	// eventLog.log(8, io::UnitDied{3});
 
 	return 0;
 }

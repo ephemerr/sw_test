@@ -1,13 +1,20 @@
 #include "Unit.hpp"
+#include "Attack.hpp"
 #include <cstdint>
 
 namespace sw::logic {
 
-    Unit::ParamTable Unit::_paramTable =
+
+    const Unit::Params& Unit::getDefaultParams(const std::string &str)
     {
-        {"Swordsman",{1,100,1,{"SwordsmanMele"}}},
-        {"Hunter",{2,100,1,{"HunterMele", "HunterRanged"}}},
-    };
+        static Unit::ParamTable _paramTable =
+        {
+            {"Swordsman",{1,100,1,{"SwordsmanMelee"}}},
+            {"Hunter",{2,100,1,{"HunterMelee", "HunterRanged"}}},
+        };
+
+        return _paramTable[str];
+    }
 
     Unit::Unit()
     {
@@ -15,12 +22,21 @@ namespace sw::logic {
 
     Unit::Unit(Params &params): _params(params)
     {
+        for (const auto &attackName : _params.attacks)
+        {
+            auto attack = Attack::getDefaultParams(attackName);
+           _attacksParams.push_back(attack);
+        }
     }
 
     void Unit::setCoords(uint32_t x, uint32_t y)
     {
         _x = x;
         _y = y;
+    }
+    void Unit::setAttacks(std::vector<Attack::Params> &attacks)
+    {
+        _attacksParams = attacks;
     }
 
     uint32_t Unit::getX() const
