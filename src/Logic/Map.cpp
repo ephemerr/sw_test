@@ -57,28 +57,9 @@ namespace sw::logic
                    //TODO error messages
                    return;
                 }
-                const auto& maxDist = std::prev(distances.end())->first;
-                const auto& minDist = distances.begin()->first;
-                std::vector<uint32_t> targetUnits;
                 for (const auto& attack: activeUnit.getAttacks())
                 {
-                    if (attack.type | Attack::ATTACK_TYPE_RANGED
-                           && minDist == 1) continue;
-                    for (int i=minDist; i<=maxDist; i++)
-                    {
-                        if (i < attack.minDistance) continue;
-                        if (i > attack.distance) break;
-                        auto targets = distances.equal_range(i);
-                        for (auto& it = targets.first; it != targets.second; it = std::next(it))
-                        {   // TODO make it by std algorithm
-                            targetUnits.push_back(it->second);
-                            break;
-                        }
-                    }
-                    std::random_device rd;
-                    std::mt19937 gen(rd());
-                    std::uniform_int_distribution<> distr(0, targetUnits.size()-1);
-                    auto targetId = distr(gen);
+                    auto targetId = findTarget(distances, attack);
                     doAttack(attack, activeUnit.getId(), targetId);
                     break;
                 }
@@ -104,17 +85,31 @@ namespace sw::logic
         return res;
     }
 
-    Map::DistancesList Map::findOpenTargets(const Coord& from, const Attack::Params& attack) const
+    uint32_t Map::findTarget(const DistancesList& distances, const Attack::Params& attack) const
     {
-        DistancesList res;
-        for(const auto& [id,unit] : _units)
+        uint32_t res = Unit::UNIT_ID_INVALID;
+        const auto& maxDist = std::prev(distances.end())->first;
+        const auto& minDist = distances.begin()->first;
+        std::random_device rd;
+        std::mt19937 gen(rd());
+
+        std::vector<uint32_t> targetUnits;
+
+        if (attack.type | Attack::ATTACK_TYPE_RANGED
+               && minDist == 1) return res;
+        for (int i=minDist; i<=maxDist; i++)
         {
-            const Coord& target = unit.getCoord();
-            auto distance = from.distance(target);
-            if (attack.type | Attack::ATTACK_TYPE_RANGED && distance == 1)
-            {
-                return {};
+            if (i < attack.minDistance) continue;
+            if (i > attack.distance) break;
+
+            auto targets = distances.equal_range(i);
+            for (auto& it = targets.first; it != targets.second; it = std::next(it))
+            {   // TODO make it by std algorithm
+                targetUnits.push_back(it->second);
             }
+            std::uniform_int_distribution<> distr(0, targetUnits.size()-1);
+            res = distr(gen);
+            break;
         }
         return res;
     }

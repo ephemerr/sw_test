@@ -22,6 +22,8 @@ namespace sw::logic
             std::vector<std::string> attacks{};
         };
 
+        static const uint32_t UNIT_ID_INVALID = UINT32_MAX;
+
         typedef std::unordered_map<std::string,Params> ParamTable;
         static const Params& getDefaultParams(const std::string &str);
 

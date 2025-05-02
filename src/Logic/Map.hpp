@@ -25,7 +25,7 @@ namespace sw::logic
         void doAttack(const Attack::Params& attack, uint32_t offender, uint32_t target);
         typedef std::multimap<uint32_t, uint32_t> DistancesList;
         DistancesList distancesToUnits(const Coord& from) const;
-        DistancesList findOpenTargets(const Coord& from, const Attack::Params& attack) const;
+        uint32_t findTarget(const DistancesList& distances, const Attack::Params& attack) const;
 
 	};
 }
