@@ -49,4 +49,8 @@ namespace sw::logic {
         return _coords;
     }
 
+    uint32_t Unit::getId() const
+    {
+        return _params.id;
+    }
 }

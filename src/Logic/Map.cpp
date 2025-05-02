@@ -1,11 +1,15 @@
 #include "Map.hpp"
 #include "Attack.hpp"
+
 #include "Unit.hpp"
 #include "Coord.hpp"
 
-#include <cstdint>
 #include <vector>
+#include <cstdint>
+#include <iterator>
 #include <utility>
+#include <iterator>
+#include <random>
 
 namespace sw::logic
 {
@@ -47,21 +51,46 @@ namespace sw::logic
        {
            for (auto &[id, activeUnit]: _units)
            {
-               auto distances = distancesToUnits(activeUnit.getCoord());
-               for (const auto& attack: activeUnit.getAttacks())
-               {
-
-               }
-
-               for (auto& target : _units) {
-
-               }
+                auto distances = distancesToUnits(activeUnit.getCoord());
+                if (!distances.size())
+                {
+                   //TODO error messages
+                   return;
+                }
+                const auto& maxDist = std::prev(distances.end())->first;
+                const auto& minDist = distances.begin()->first;
+                std::vector<uint32_t> targetUnits;
+                for (const auto& attack: activeUnit.getAttacks())
+                {
+                    if (attack.type | Attack::ATTACK_TYPE_RANGED
+                           && minDist == 1) continue;
+                    for (int i=minDist; i<=maxDist; i++)
+                    {
+                        if (i < attack.minDistance) continue;
+                        if (i > attack.distance) break;
+                        auto targets = distances.equal_range(i);
+                        for (auto& it = targets.first; it != targets.second; it = std::next(it))
+                        {   // TODO make it by std algorithm
+                            targetUnits.push_back(it->second);
+                            break;
+                        }
+                    }
+                    std::random_device rd;
+                    std::mt19937 gen(rd());
+                    std::uniform_int_distribution<> distr(0, targetUnits.size()-1);
+                    auto targetId = distr(gen);
+                    doAttack(attack, activeUnit.getId(), targetId);
+                    break;
+                }
            }
        }
     }
-    //
-    // void Map::doAttack(const Attack::Params& attack, uint32_t targer, uint32_t targer);
-    //
+
+    void Map::doAttack(const Attack::Params& attack, uint32_t offender, uint32_t target)
+    {
+
+    }
+
 
     Map::DistancesList Map::distancesToUnits(const Coord& from) const
     {
@@ -85,10 +114,6 @@ namespace sw::logic
             if (attack.type | Attack::ATTACK_TYPE_RANGED && distance == 1)
             {
                 return {};
-            }
-            if (distance > attack.distance || distance < attack.minDistance)
-            {
-                continue;
             }
         }
         return res;

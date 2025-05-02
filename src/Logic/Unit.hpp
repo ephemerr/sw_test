@@ -16,7 +16,7 @@ namespace sw::logic
 
         struct Params
         {
-            uint32_t id{};
+            uint32_t id{}; //TODO move id up to the class body
             uint32_t hp{};
             uint32_t speed{};
             std::vector<std::string> attacks{};
@@ -31,6 +31,8 @@ namespace sw::logic
 
         void setCoords(const Coord& coords);
         const Coord& getCoord() const;
+
+        uint32_t getId() const;
 
         Unit();
         Unit(const Params &params);
