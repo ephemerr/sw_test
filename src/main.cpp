@@ -2,20 +2,15 @@
 #include <IO/Commands/March.hpp>
 #include <IO/Commands/SpawnHunter.hpp>
 #include <IO/Commands/SpawnSwordsman.hpp>
-#include <IO/Events/MapCreated.hpp>
-#include <IO/Events/MarchEnded.hpp>
-#include <IO/Events/MarchStarted.hpp>
-#include <IO/Events/UnitAttacked.hpp>
-#include <IO/Events/UnitDied.hpp>
-#include <IO/Events/UnitMoved.hpp>
-#include <IO/Events/UnitSpawned.hpp>
 #include <IO/System/CommandParser.hpp>
 #include <IO/System/EventLog.hpp>
 #include <IO/System/PrintDebug.hpp>
 
+#include "Logic/Events/Events.hpp"
 #include "Logic/Attack.hpp"
 #include "Logic/Map.hpp"
 #include "Logic/Unit.hpp"
+#include "Game.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -40,8 +35,10 @@ int main(int argc, char** argv)
 	// Code for example...
 
     logic::Map map;
+    map.setEventHandler([&eventLog] (uint64_t tic, logic::Event& event) { eventLog.log(tic, event); });
 
 	std::cout << "Commands:\n";
+
 	io::CommandParser parser;
 	parser.add<io::CreateMap>([&map](auto command)
     {
@@ -83,5 +80,38 @@ int main(int argc, char** argv)
 
 	parser.parse(file);
 
-	return 0;
+	// return 0;
+
+	eventLog.log(1, logic::MapCreated{{}, 10, 10});
+	eventLog.log(1, logic::UnitSpawned{{}, 1, "Swordsman", 0, 0});
+	eventLog.log(1, logic::UnitSpawned{{}, 2, "Hunter", 9, 0});
+	eventLog.log(1, logic::MarchStarted{1, 0, 0, 9, 0});
+	eventLog.log(1, logic::MarchStarted{2, 9, 0, 0, 0});
+	eventLog.log(1, logic::UnitSpawned{{},3, "Swordsman", 0, 9});
+	eventLog.log(1, logic::MarchStarted{3, 0, 9, 0, 0});
+
+	eventLog.log(2, logic::UnitMoved{1, 1, 0});
+	eventLog.log(2, logic::UnitMoved{2, 8, 0});
+	eventLog.log(2, logic::UnitMoved{3, 0, 8});
+
+	eventLog.log(3, logic::UnitMoved{1, 2, 0});
+	eventLog.log(3, logic::UnitMoved{2, 7, 0});
+	eventLog.log(3, logic::UnitMoved{3, 0, 7});
+
+	eventLog.log(4, logic::UnitMoved{1, 3, 0});
+	eventLog.log(4, logic::UnitAttacked{2, 1, 5, 0});
+	eventLog.log(4, logic::UnitDied{1});
+	eventLog.log(4, logic::UnitMoved{3, 0, 6});
+
+	eventLog.log(5, logic::UnitMoved{2, 6, 0});
+	eventLog.log(5, logic::UnitMoved{3, 0, 5});
+
+	eventLog.log(6, logic::UnitMoved{2, 5, 0});
+	eventLog.log(6, logic::UnitMoved{3, 0, 4});
+
+	eventLog.log(7, logic::UnitAttacked{2, 3, 5, 5});
+	eventLog.log(7, logic::UnitMoved{3, 0, 3});
+
+	eventLog.log(8, logic::UnitAttacked{2, 3, 5, 0});
+	eventLog.log(8, logic::UnitDied{3});
 }

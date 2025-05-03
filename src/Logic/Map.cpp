@@ -47,24 +47,36 @@ namespace sw::logic
 
     void Map::startTheBattle()
     {
-       while(_units.size() > 1)
-       {
-           for (auto &[id, activeUnit]: _units)
-           {
+        while(_units.size() > 1)
+        {
+            for (auto &[id, activeUnit]: _units)
+            {
                 auto distances = distancesToUnits(activeUnit.getCoord());
                 if (!distances.size())
                 {
                    //TODO error messages
                    return;
                 }
+                bool attackComplete = false;
                 for (const auto& attack: activeUnit.getAttacks())
                 {
                     auto targetId = findTarget(distances, attack);
+                    if (targetId == Unit::UNIT_ID_INVALID)
+                    {
+                        break;
+                    }
                     doAttack(attack, activeUnit.getId(), targetId);
+                    attackComplete = true;
                     break;
                 }
-           }
-       }
+                if (!attackComplete)
+                {
+                    // TODO smart choice of march target
+                    auto moveTarget = distances.begin()->second;
+                    doMarch(activeUnit.getId(), moveTarget);
+                }
+            }
+        }
     }
 
     void Map::doAttack(const Attack::Params& attack, uint32_t offender, uint32_t target)
@@ -72,6 +84,9 @@ namespace sw::logic
 
     }
 
+    void Map::doMarch(uint32_t offender, uint32_t target) {
+
+    }
 
     Map::DistancesList Map::distancesToUnits(const Coord& from) const
     {
@@ -112,6 +127,17 @@ namespace sw::logic
             break;
         }
         return res;
+    }
+
+    void Map::setEventHandler(EventHandler handler)
+    {
+        _eventHandler = handler;
+    }
+
+    void Map::reportEvent(uint64_t tick, const logic::Event&& event)
+    {
+        if (_eventHandler != nullptr)
+        _eventHandler(tick, event);
     }
 }
 
