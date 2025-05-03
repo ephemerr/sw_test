@@ -9,8 +9,8 @@ namespace sw::logic {
     {
         static Unit::ParamTable _paramTable =
         {
-            {"Swordsman", {1,100,1,{"Melee"}}},
-            {"Hunter",    {2,100,1,{"Ranged", "Melee"}}},
+            {"Swordsman", {"Swordsman",1,100,1,{"Melee"}}},
+            {"Hunter",    {"Hunter",2,100,1,{"Ranged", "Melee"}}},
         };
 
         return _paramTable[str];

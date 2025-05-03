@@ -16,6 +16,7 @@ namespace sw::logic
 
         struct Params
         {
+            std::string type;
             uint32_t id{}; //TODO move id up to the class body
             uint32_t hp{};
             uint32_t speed{};

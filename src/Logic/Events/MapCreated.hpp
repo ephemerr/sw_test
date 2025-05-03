@@ -1,12 +1,10 @@
 #pragma once
 
-#include "Event.hpp"
-
 #include <cstdint>
 
 namespace sw::logic
 {
-	struct MapCreated : public Event
+	struct MapCreated
 	{
 		constexpr static const char* Name = "MAP_CREATED";
 

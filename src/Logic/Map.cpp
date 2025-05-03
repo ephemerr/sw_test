@@ -15,6 +15,7 @@ namespace sw::logic
 {
     Map::Map()
     {
+        _tick = 0;
     }
 
     void Map::setCoords(uint32_t w, uint32_t h)
@@ -35,7 +36,8 @@ namespace sw::logic
                 if (c.x == x && c.y == y)
                     return;
             }
-           _units[id].setCoords({x,y});
+           _units[id].setCoords({x, y});
+            reportEvent(UnitMoved{id, x, y});
         }
     }
 
@@ -49,6 +51,8 @@ namespace sw::logic
     {
         while(_units.size() > 1)
         {
+            _tick++;
+
             for (auto &[id, activeUnit]: _units)
             {
                 auto distances = distancesToUnits(activeUnit.getCoord());
@@ -127,17 +131,6 @@ namespace sw::logic
             break;
         }
         return res;
-    }
-
-    void Map::setEventHandler(EventHandler handler)
-    {
-        _eventHandler = handler;
-    }
-
-    void Map::reportEvent(uint64_t tick, const logic::Event&& event)
-    {
-        if (_eventHandler != nullptr)
-        _eventHandler(tick, event);
     }
 }
 

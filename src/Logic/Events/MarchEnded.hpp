@@ -2,11 +2,9 @@
 
 #include <cstdint>
 
-#include "Event.hpp"
-
 namespace sw::logic
 {
-	struct MarchEnded : Event
+	struct MarchEnded
 	{
 		constexpr static const char* Name = "MARCH_ENDED";
 

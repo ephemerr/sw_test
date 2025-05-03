@@ -4,6 +4,10 @@
 #include "Unit.hpp"
 #include "Coord.hpp"
 #include "Events/Event.hpp"
+#include "Events/UnitMoved.hpp"
+#include "Events/UnitSpawned.hpp"
+
+#include "../EventLog.hpp" // TODO fix this dependence
 
 #include <unordered_map>
 #include <map>
@@ -17,8 +21,8 @@ namespace sw::logic {
 		uint32_t _width{};
 		uint32_t _height{};
         std::unordered_map<uint32_t, Unit> _units;
-        typedef std::function<void(uint64_t, logic::Event&)> EventHandler;
-        EventHandler _eventHandler = nullptr;
+        EventLog _logger;
+        uint64_t _tick;
 
     public:
         Map();
@@ -31,7 +35,11 @@ namespace sw::logic {
         typedef std::multimap<uint32_t, uint32_t> DistancesList;
         DistancesList distancesToUnits(const Coord& from) const;
         uint32_t findTarget(const DistancesList& distances, const Attack::Params& attack) const;
-        void setEventHandler(EventHandler handler);
-        void reportEvent(uint64_t tic, logic::Event& event);
+
+        template<class TEvent>
+        void reportEvent(TEvent&& event)
+        {
+            _logger.log(_tick, std::forward<TEvent>(event));
+        }
 	};
 }
