@@ -34,7 +34,12 @@ int main(int argc, char** argv)
 
 	// Code for example...
 
-    logic::Map map;
+
+    logic::Map map( eventLog,
+       [] (uint64_t code, std::string msg)
+            {
+                // printDebug(std::cout, msg);
+            });
 
 	std::cout << "Commands:\n";
 
@@ -43,7 +48,7 @@ int main(int argc, char** argv)
     {
         printDebug(std::cout, command);
         map.setCoords(command.width, command.height);
-	    eventLog.log(1, logic::MapCreated{{}, command.width, command.height});
+	    eventLog.log(1, logic::MapCreated{command.width, command.height});
     })
     .add<io::SpawnSwordsman>([&map, &eventLog](auto command)
     {

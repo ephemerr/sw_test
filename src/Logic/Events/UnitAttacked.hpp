@@ -3,11 +3,9 @@
 #include <cstdint>
 #include <string>
 
-#include "Event.hpp"
-
 namespace sw::logic
 {
-	struct UnitAttacked : public Event
+	struct UnitAttacked
 	{
 		constexpr static const char* Name = "UNIT_ATTACKED";
 

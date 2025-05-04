@@ -14,9 +14,9 @@
 
 namespace sw::logic
 {
-    Map::Map()
+    Map::Map(Map::EventHandler eventHandler, Map::ErrorHandler errorHandler)
+    : _eventHandler(eventHandler), _errorHandler(errorHandler), _tick(1)
     {
-        _tick = 1;
     }
 
     void Map::setCoords(uint32_t w, uint32_t h)
@@ -86,7 +86,7 @@ namespace sw::logic
 
     void Map::doAttack(const Attack::Params& attack, uint32_t offender, uint32_t target)
     {
-        reportEvent(UnitAttacked{{}, offender, target, attack.strength, _units[target].getHp()});
+        reportEvent(UnitAttacked{offender, target, attack.strength, _units[target].getHp()});
     }
 
     void Map::doMarch(uint32_t offender, uint32_t target)
@@ -136,14 +136,5 @@ namespace sw::logic
         return res;
     }
 
-    void Map::reportEvent(Event&& event)
-    {
-        _eventHandler(_tick, event);
-    }
-
-    void Map::setErrorHandler(ErrorHandler handler)
-    {
-       _reportError = handler;
-    }
 }
 
