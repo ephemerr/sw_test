@@ -53,4 +53,15 @@ namespace sw::logic {
     {
         return _params.id;
     }
+
+    uint32_t Unit::getHp() const
+    {
+        return _params.hp;
+    }
+
+    uint32_t Unit::getSpeed() const
+    {
+        return _params.speed;
+    }
+
 }

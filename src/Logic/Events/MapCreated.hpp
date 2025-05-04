@@ -2,9 +2,11 @@
 
 #include <cstdint>
 
+#include "Event.hpp"
+
 namespace sw::logic
 {
-	struct MapCreated
+	struct MapCreated : public Event
 	{
 		constexpr static const char* Name = "MAP_CREATED";
 

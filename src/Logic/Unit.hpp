@@ -36,6 +36,8 @@ namespace sw::logic
         const Coord& getCoord() const;
 
         uint32_t getId() const;
+        uint32_t getHp() const;
+        uint32_t getSpeed() const;
 
         Unit();
         Unit(const Params &params);

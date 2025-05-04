@@ -3,6 +3,7 @@
 
 #include "Unit.hpp"
 #include "Coord.hpp"
+#include "Events/Events.hpp"
 
 #include <vector>
 #include <cstdint>
@@ -15,7 +16,7 @@ namespace sw::logic
 {
     Map::Map()
     {
-        _tick = 0;
+        _tick = 1;
     }
 
     void Map::setCoords(uint32_t w, uint32_t h)
@@ -36,8 +37,8 @@ namespace sw::logic
                 if (c.x == x && c.y == y)
                     return;
             }
+            const auto& c = _units[id].getCoord();
            _units[id].setCoords({x, y});
-            reportEvent(UnitMoved{id, x, y});
         }
     }
 
@@ -85,11 +86,13 @@ namespace sw::logic
 
     void Map::doAttack(const Attack::Params& attack, uint32_t offender, uint32_t target)
     {
-
+        reportEvent(UnitAttacked{{}, offender, target, attack.strength, _units[target].getHp()});
     }
 
-    void Map::doMarch(uint32_t offender, uint32_t target) {
-
+    void Map::doMarch(uint32_t offender, uint32_t target)
+    {
+        // reportEvent(MarchStarted{id, c.x, c.y, x, y});
+        // reportEvent(MarchEnded{id, x, y});
     }
 
     Map::DistancesList Map::distancesToUnits(const Coord& from) const
@@ -131,6 +134,16 @@ namespace sw::logic
             break;
         }
         return res;
+    }
+
+    void Map::reportEvent(Event&& event)
+    {
+        _eventHandler(_tick, event);
+    }
+
+    void Map::setErrorHandler(ErrorHandler handler)
+    {
+       _reportError = handler;
     }
 }
 
