@@ -44,8 +44,6 @@ TEST_CASE( "Map class test", "[map]" ) {
             });
 
     map.setCoords(10, 10);
-    map.SpawnHunter(10, 10);
 
     REQUIRE( eventHandler.dataQueue.size() == 1 );
 }
-

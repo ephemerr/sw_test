@@ -21,7 +21,8 @@ namespace sw::logic {
         typedef sw::EventLog EventHandler;
         typedef std::multimap<uint32_t, uint32_t> DistancesList;
 
-        Map(EventHandler EventHandler, ErrorHandler errorHandler);
+        Map();
+        void init(EventHandler EventHandler, ErrorHandler errorHandler);
         void setCoords(uint32_t w, uint32_t h);
         void moveUnit(uint32_t id, uint32_t x, uint32_t y);
         void spawnUnit(const Unit::Params& params, const Unit::AttackParamsList& attacksParams);
@@ -41,7 +42,7 @@ namespace sw::logic {
     private:
 		uint32_t _width{};
 		uint32_t _height{};
-        uint64_t _tick;
+        uint64_t _tick = 0;
         UnitList _units;
         ErrorHandler _errorHandler;
         EventHandler _eventHandler;

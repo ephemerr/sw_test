@@ -14,9 +14,15 @@
 
 namespace sw::logic
 {
-    Map::Map(Map::EventHandler eventHandler, Map::ErrorHandler errorHandler)
-    : _eventHandler(eventHandler), _errorHandler(errorHandler), _tick(1)
+    Map::Map()
     {
+    }
+
+    void Map::init(Map::EventHandler eventHandler, Map::ErrorHandler errorHandler)
+    {
+        _eventHandler = eventHandler;
+        _errorHandler = errorHandler;
+        _tick = 1;
     }
 
     void Map::setCoords(uint32_t w, uint32_t h)
