@@ -24,14 +24,15 @@ namespace sw::logic {
         Map();
         void init(EventHandler EventHandler, ErrorHandler errorHandler);
         void setCoords(uint32_t w, uint32_t h);
-        void moveUnit(uint32_t id, uint32_t x, uint32_t y);
+        bool isOccupied(const Coord& coords) const;
+        void moveUnit(uint32_t id, const Coord& to);
         void spawnUnit(const Unit::Params& params, const Unit::AttackParamsList& attacksParams);
         void startTheBattle();
         void doAttack(const Attack::Params& attack, uint32_t offender, uint32_t target);
         void doMarch(uint32_t offender, uint32_t target);
         DistancesList distancesToUnits(const Coord& from) const;
         uint32_t findTarget(const DistancesList& distances, const Attack::Params& attack) const;
-        void reportError(uint32_t code, std::string msg);
+        void reportError(std::string msg);
 
         template<class TEvent>
         void reportEvent(TEvent&& event)
@@ -46,6 +47,5 @@ namespace sw::logic {
         UnitList _units;
         ErrorHandler _errorHandler;
         EventHandler _eventHandler;
-
 	};
 }

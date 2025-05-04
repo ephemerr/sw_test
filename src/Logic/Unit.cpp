@@ -27,6 +27,7 @@ namespace sw::logic {
             auto attack = Attack::getDefaultParams(attackName);
            _attacksParams.push_back(attack);
         }
+        _hp = params.hp;
     }
 
     void Unit::setAttacks(const AttackParamsList &attacks)
@@ -57,6 +58,11 @@ namespace sw::logic {
     uint32_t Unit::getHp() const
     {
         return _params.hp;
+    }
+
+    void Unit::setHp(uint32_t hp)
+    {
+        _hp = hp;
     }
 
     uint32_t Unit::getSpeed() const

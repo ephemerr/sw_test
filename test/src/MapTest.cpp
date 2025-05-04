@@ -31,13 +31,15 @@ public:
     {
         MapTestEventVisitor visitor;
         event.visit(visitor);
+        std::cout << "HEY" << std::endl;
     }
 };
 
 TEST_CASE( "Map class test", "[map]" ) {
     MapEventQueue eventHandler;
 
-    sw::logic::Map map(eventHandler,
+    sw::logic::Map map;
+    map.init(eventHandler,
             [] (uint32_t code, std::string message)
             {
                 std::cout << message << std::endl;

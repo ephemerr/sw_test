@@ -35,8 +35,10 @@ namespace sw::logic
         void setCoords(const Coord& coords);
         const Coord& getCoord() const;
 
-        uint32_t getId() const;
+        void setHp(uint32_t hp);
         uint32_t getHp() const;
+
+        uint32_t getId() const;
         uint32_t getSpeed() const;
 
         Unit();
@@ -45,6 +47,7 @@ namespace sw::logic
     private:
         Coord _coords;
         Params _params;
+        uint32_t _hp;
         std::vector<logic::Attack::Params> _attacksParams;
     };
 }

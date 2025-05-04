@@ -2,15 +2,15 @@
 
 #include "IO/System/details/PrintFieldVisitor.hpp"
 #include <iostream>
-#include <typeindex>
-#include <unordered_map>
+#include <cstdint>
 
 namespace sw
 {
 	class EventLog
 	{
 	public:
-		void log(uint64_t tick, auto event)
+        template<class TEvent>
+		void log(uint64_t tick, TEvent&& event)
 		{
 			std::cout << "[" << tick << "] " << event.Name << " ";
 			PrintFieldVisitor visitor(std::cout);

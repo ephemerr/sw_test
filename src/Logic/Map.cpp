@@ -11,6 +11,7 @@
 #include <utility>
 #include <iterator>
 #include <random>
+#include <format>
 
 namespace sw::logic
 {
@@ -31,20 +32,25 @@ namespace sw::logic
         _height = h;
     }
 
-    void Map::moveUnit(uint32_t id, uint32_t x, uint32_t y)
+    void Map::moveUnit(uint32_t id, const Coord& to)
     {
-        if (!x || x > _width|| !y || y > _height) return;
+        if (!to.x || to.x > _width|| !to.y || to.y > _height)
+        {
+            return;
+        }
 
         if (_units.count(id))
         {
             for (const auto &u : _units)
             {
                 const Coord& c = u.second.getCoord();
-                if (c.x == x && c.y == y)
+                if (c.x == to.x && c.y == to.y)
+                {
+                    reportError(std::format("There is already unit at {} {}", to.x, to.y));
                     return;
+                }
             }
-            const auto& c = _units[id].getCoord();
-           _units[id].setCoords({x, y});
+           _units[id].setCoords({to.x, to.y});
         }
     }
 
@@ -58,6 +64,8 @@ namespace sw::logic
     {
         while(_units.size() > 1)
         {
+            if (_tick > 1000) break;
+
             _tick++;
 
             for (auto &[id, activeUnit]: _units)
@@ -90,15 +98,60 @@ namespace sw::logic
         }
     }
 
-    void Map::doAttack(const Attack::Params& attack, uint32_t offender, uint32_t target)
+    void Map::doAttack(const Attack::Params& attack, uint32_t offenderId, uint32_t targetId)
     {
-        reportEvent(UnitAttacked{offender, target, attack.strength, _units[target].getHp()});
+        auto& offender = _units[offenderId];
+        auto& target = _units[targetId];
+        auto hp = target.getHp();
+
+        hp = (attack.strength > hp) ? 0 : hp - attack.strength;
+
+        reportEvent(UnitAttacked{offenderId, targetId, attack.strength, hp});
+
+        if (hp)
+        {
+            target.setHp(hp);
+        }
+        else
+        {
+            _units.erase(targetId);
+            reportEvent(UnitDied{targetId});
+        }
     }
 
-    void Map::doMarch(uint32_t offender, uint32_t target)
+    void Map::doMarch(uint32_t unitId, uint32_t targetId)
     {
-        // reportEvent(MarchStarted{id, c.x, c.y, x, y});
-        // reportEvent(MarchEnded{id, x, y});
+        // TODO it's just a dummy algorithm - needs rewriting
+        const Coord& target = _units[targetId].getCoord();
+        const Coord& from = _units[unitId].getCoord();
+        Coord closest = from;
+        uint32_t minDist = from.distance(target);
+        const auto speed = _units[unitId].getSpeed();
+
+        reportEvent(MarchStarted{unitId, from.x, from.y, target.x, target.y});
+
+        for (uint32_t x=0; x<_width; x++)
+        {
+            for (uint32_t y=0; y<_width; y++)
+            {
+                const Coord xy{x, y};
+                if (from.distance(xy) > speed || isOccupied(xy))
+                {
+                    continue;
+                }
+                auto dist = xy.distance(target);
+                if (dist < minDist)
+                {
+                    closest = xy;
+                    minDist = dist;
+                }
+            }
+        }
+        if (closest != from)
+        {
+           moveUnit(unitId, closest);
+        }
+        reportEvent(MarchEnded{unitId, target.x, target.y});
     }
 
     Map::DistancesList Map::distancesToUnits(const Coord& from) const
@@ -142,5 +195,21 @@ namespace sw::logic
         return res;
     }
 
+    void Map::reportError(std::string msg)
+    {
+        _errorHandler(0, msg);
+    }
+
+    bool Map::isOccupied(const Coord& coords) const
+    {
+        for (const auto& [id, u] : _units)
+        {
+            if (coords == u.getCoord())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 

@@ -10,5 +10,6 @@ namespace sw::logic {
         uint32_t y;
 
         uint32_t distance(const Coord& target) const;
+        bool operator==(const Coord& rhs) const;
     };
 }
