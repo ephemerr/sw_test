@@ -17,37 +17,33 @@ namespace sw::logic
         struct Params
         {
             std::string type;
-            uint32_t id{}; //TODO move id up to the class body
             uint32_t hp{};
             uint32_t speed{};
             std::vector<std::string> attacks{};
         };
 
-        static const uint32_t UNIT_ID_INVALID = UINT32_MAX;
-
         typedef std::unordered_map<std::string,Params> ParamTable;
+        typedef std::vector<Attack::Params> AttackParamsList;
+
+        static const uint32_t UNIT_ID_INVALID = UINT32_MAX;
         static const Params& getDefaultParams(const std::string &str);
 
-        typedef std::vector<Attack::Params> AttackParamsList;
+        Unit();
+        Unit(const Params &params, uint32_t id);
         void setAttacks(const AttackParamsList &attacks);
         const AttackParamsList& getAttacks() const;
-
         void setCoords(const Coord& coords);
         const Coord& getCoord() const;
-
         void setHp(uint32_t hp);
         uint32_t getHp() const;
-
         uint32_t getId() const;
         uint32_t getSpeed() const;
-
-        Unit();
-        Unit(const Params &params);
 
     private:
         Coord _coords;
         Params _params;
         uint32_t _hp;
+        uint32_t _id;
         std::vector<logic::Attack::Params> _attacksParams;
     };
 }

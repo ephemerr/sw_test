@@ -17,7 +17,7 @@ namespace sw
         map.init( eventLog,
            [] (uint64_t code, std::string msg)
                 {
-                    // printDebug(std::cout, msg);
+                    std::cout << msg;
                 });
 
         parser.add<io::CreateMap>([this](auto command)
@@ -27,30 +27,28 @@ namespace sw
         })
         .add<io::SpawnSwordsman>([this](auto command)
         {
-            auto u = logic::Unit::getDefaultParams("Swordsman");
-            u.id = command.unitId;
-            u.hp = command.hp;
-            auto a1 = logic::Attack::getDefaultParams("Melee");
-            a1.strength = command.strength;
-            logic::Unit::AttackParamsList attacksParams = {a1};
-            map.spawnUnit(u, attacksParams);
-            map.moveUnit(u.id, {command.x, command.y});
-            eventLog.log(0, logic::UnitSpawned{u.id, "Swordsman", command.x, command.y});
+            auto unitParams = logic::Unit::getDefaultParams("Swordsman");
+            unitParams.hp = command.hp;
+            auto attackParams = logic::Attack::getDefaultParams("Melee");
+            attackParams.strength = command.strength;
+            logic::Unit::AttackParamsList attacksParams = {attackParams};
+            map.spawnUnit(unitParams, attacksParams, command.unitId);
+            map.moveUnit(command.unitId, {command.x, command.y});
+            eventLog.log(1, logic::UnitSpawned{command.unitId, "Swordsman", command.x, command.y});
         })
         .add<io::SpawnHunter>([this](auto command)
         {
-            logic::Unit::Params u = logic::Unit::getDefaultParams("Hunter");
-            u.id = command.unitId;
-            u.hp = command.hp;
-            auto a1 = logic::Attack::getDefaultParams("Ranged");
-            a1.strength = command.agility;
-            a1.distance = command.range;
-            auto a2 = logic::Attack::getDefaultParams("Melee");
-            a2.strength = command.strength;
-            logic::Unit::AttackParamsList attacksParams = {a1, a2};
-            map.spawnUnit(u, attacksParams);
-            map.moveUnit(u.id, {command.x, command.y});
-            eventLog.log(1, logic::UnitSpawned{u.id, "Hunter", command.x, command.y});
+            auto unitParams = logic::Unit::getDefaultParams("Hunter");
+            unitParams.hp = command.hp;
+            auto attackParams = logic::Attack::getDefaultParams("Ranged");
+            attackParams.strength = command.agility;
+            attackParams.distance = command.range;
+            auto attackParams2 = logic::Attack::getDefaultParams("Melee");
+            attackParams2.strength = command.strength;
+            logic::Unit::AttackParamsList attacksParams = {attackParams, attackParams2};
+            map.spawnUnit(unitParams, attacksParams, command.unitId);
+            map.moveUnit(command.unitId, {command.x, command.y});
+            eventLog.log(1, logic::UnitSpawned{command.unitId, "Hunter", command.x, command.y});
         })
         .add<io::March>([this](auto command)
         {

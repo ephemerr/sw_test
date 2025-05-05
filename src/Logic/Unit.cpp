@@ -9,8 +9,8 @@ namespace sw::logic {
     {
         static Unit::ParamTable _paramTable =
         {
-            {"Swordsman", {"Swordsman",1,100,1,{"Melee"}}},
-            {"Hunter",    {"Hunter",2,100,1,{"Ranged", "Melee"}}},
+            {"Swordsman", {"Swordsman",100,1,{"Melee"}}},
+            {"Hunter",    {"Hunter",100,1,{"Ranged", "Melee"}}},
         };
 
         return _paramTable[str];
@@ -20,7 +20,8 @@ namespace sw::logic {
     {
     }
 
-    Unit::Unit(const Params &params): _params(params)
+    Unit::Unit(const Params &params, uint32_t id)
+        : _params(params), _id(id)
     {
         for (const auto &attackName : _params.attacks)
         {
@@ -52,12 +53,12 @@ namespace sw::logic {
 
     uint32_t Unit::getId() const
     {
-        return _params.id;
+        return _id;
     }
 
     uint32_t Unit::getHp() const
     {
-        return _params.hp;
+        return _hp;
     }
 
     void Unit::setHp(uint32_t hp)

@@ -34,8 +34,9 @@ namespace sw::logic
 
     void Map::moveUnit(uint32_t id, const Coord& to)
     {
-        if (!to.x || to.x > _width|| !to.y || to.y > _height)
+        if (to.x > _width || to.y > _height)
         {
+            reportError(std::format("Can't place unit outside of the map {} {}\n", to.x, to.y));
             return;
         }
 
@@ -46,55 +47,62 @@ namespace sw::logic
                 const Coord& c = u.second.getCoord();
                 if (c.x == to.x && c.y == to.y)
                 {
-                    reportError(std::format("There is already unit at {} {}", to.x, to.y));
-                    return;
+                    reportError(std::format("Warning: There is already unit at {} {}\n", to.x, to.y));
                 }
             }
            _units[id].setCoords({to.x, to.y});
         }
     }
 
-    void Map::spawnUnit(const Unit::Params& params, const Unit::AttackParamsList& attacksParams = {})
+    void Map::spawnUnit(const Unit::Params& params,
+            const Unit::AttackParamsList& attacksParams = {},
+            uint32_t id=Unit::UNIT_ID_INVALID)
     {
-       _units[params.id] = Unit(params);
-       _units[params.id].setAttacks(attacksParams);
+       _units[id] = Unit(params, id);
+       _units[id].setAttacks(attacksParams);
+    }
+
+    void Map::doIteration()
+    {
+        _tick++;
+
+        for (auto &[id, activeUnit]: _units)
+        {
+            auto distances = distancesToUnits(activeUnit.getCoord());
+            if (!distances.size())
+            {
+               reportError("Error: can't find other units to attack");
+               return ;
+            }
+            bool attackComplete = false;
+            for (const auto& attack: activeUnit.getAttacks())
+            {
+                auto targetId = findTarget(distances, attack);
+                if (targetId == Unit::UNIT_ID_INVALID)
+                {
+                    break;
+                }
+                doAttack(attack, activeUnit.getId(), targetId);
+                attackComplete = true;
+                break;
+            }
+            if (!attackComplete)
+            {
+                // TODO smart choice of march target
+                auto moveTarget = distances.begin()->second;
+                doMarch(activeUnit.getId(), moveTarget);
+            }
+        }
+        return;
     }
 
     void Map::startTheBattle()
     {
         while(_units.size() > 1)
         {
-            if (_tick > 1000) break;
+            if (_tick > 100) break; // DEBUG
 
-            _tick++;
-
-            for (auto &[id, activeUnit]: _units)
-            {
-                auto distances = distancesToUnits(activeUnit.getCoord());
-                if (!distances.size())
-                {
-                   //TODO error messages
-                   return;
-                }
-                bool attackComplete = false;
-                for (const auto& attack: activeUnit.getAttacks())
-                {
-                    auto targetId = findTarget(distances, attack);
-                    if (targetId == Unit::UNIT_ID_INVALID)
-                    {
-                        break;
-                    }
-                    doAttack(attack, activeUnit.getId(), targetId);
-                    attackComplete = true;
-                    break;
-                }
-                if (!attackComplete)
-                {
-                    // TODO smart choice of march target
-                    auto moveTarget = distances.begin()->second;
-                    doMarch(activeUnit.getId(), moveTarget);
-                }
-            }
+            doIteration();
         }
     }
 
@@ -121,7 +129,7 @@ namespace sw::logic
 
     void Map::doMarch(uint32_t unitId, uint32_t targetId)
     {
-        // TODO it's just a dummy algorithm - needs rewriting
+        // TODO it's just a dummy algorithm - it needs rewriting
         const Coord& target = _units[targetId].getCoord();
         const Coord& from = _units[unitId].getCoord();
         Coord closest = from;
@@ -147,11 +155,11 @@ namespace sw::logic
                 }
             }
         }
-        if (closest != from)
+        if (!(closest == from))
         {
            moveUnit(unitId, closest);
         }
-        reportEvent(MarchEnded{unitId, target.x, target.y});
+        reportEvent(MarchEnded{unitId, closest.x, closest.y});
     }
 
     Map::DistancesList Map::distancesToUnits(const Coord& from) const
@@ -161,7 +169,10 @@ namespace sw::logic
         {
             const Coord& target = unit.getCoord();
             auto distance = from.distance(target);
-            res.insert(std::pair{distance,id});
+            if (distance)
+            {
+                res.insert(std::pair{distance,id});
+            }
         }
         return res;
     }
@@ -174,22 +185,26 @@ namespace sw::logic
         std::random_device rd;
         std::mt19937 gen(rd());
 
-        std::vector<uint32_t> targetUnits;
 
         if (attack.type | Attack::ATTACK_TYPE_RANGED
-               && minDist == 1) return res;
+               && minDist == 1)
+        {
+            return res;
+        }
         for (int i=minDist; i<=maxDist; i++)
         {
             if (i < attack.minDistance) continue;
             if (i > attack.distance) break;
 
+
+            std::vector<uint32_t> targetUnits;
             auto targets = distances.equal_range(i);
             for (auto& it = targets.first; it != targets.second; it = std::next(it))
             {   // TODO make it by std algorithm
                 targetUnits.push_back(it->second);
             }
             std::uniform_int_distribution<> distr(0, targetUnits.size()-1);
-            res = distr(gen);
+            res = targetUnits[distr(gen)];
             break;
         }
         return res;

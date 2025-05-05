@@ -10,7 +10,7 @@ namespace sw::logic {
         auto minX = this->x < target.x ? this->x : target.x;
         auto minY = this->y < target.y ? this->y : target.y;
         auto dX = maxX - minX;
-        auto dY = maxX - minX;
+        auto dY = maxY - minY;
         auto maxD = dX > dY ? dX : dY;
         return maxD;
     }

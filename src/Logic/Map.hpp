@@ -6,7 +6,6 @@
 
 #include "../EventLog.hpp" // TODO fix this dependence
                            //
-#include <unordered_map>
 #include <map>
 #include <cstdint>
 #include <functional>
@@ -16,7 +15,7 @@ namespace sw::logic {
 	class Map
 	{
     public:
-        typedef std::unordered_map<uint32_t, Unit> UnitList;
+        typedef std::map<uint32_t, Unit> UnitList;
         typedef std::function<void(uint32_t code, std::string)> ErrorHandler;
         typedef sw::EventLog EventHandler;
         typedef std::multimap<uint32_t, uint32_t> DistancesList;
@@ -26,7 +25,8 @@ namespace sw::logic {
         void setCoords(uint32_t w, uint32_t h);
         bool isOccupied(const Coord& coords) const;
         void moveUnit(uint32_t id, const Coord& to);
-        void spawnUnit(const Unit::Params& params, const Unit::AttackParamsList& attacksParams);
+        void spawnUnit(const Unit::Params& params, const Unit::AttackParamsList& attacksParams, uint32_t id);
+        void doIteration();
         void startTheBattle();
         void doAttack(const Attack::Params& attack, uint32_t offender, uint32_t target);
         void doMarch(uint32_t offender, uint32_t target);
